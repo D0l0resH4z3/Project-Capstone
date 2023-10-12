@@ -1,11 +1,14 @@
 # This program will generate strong passwords with the length of the user`s choice and save passwords with username in a text file
+# Import necessary modules
 import string
 import secrets
 
+# Function to generate a strong password of the given length
 def generate_password(length):
+    # Define the set of characters to choose from
     characters = string.ascii_letters + string.digits + string.punctuation
     
-    password_chars = []
+    password_chars = []  # Initialize an empty list to store password characters
 
     # Generate each character of the password one by one
     for _ in range(length):
@@ -16,10 +19,13 @@ def generate_password(length):
 
     return password
 
+# Function to save a username and password in a text file
 def save_password(username, password):
     with open("passwords.txt", "a") as file:
+        # Write the username and password 
         file.write(f"Username: {username}, Password: {password}\n")
 
+# Main function to manage password generation and storage
 def main():
     print("Password Manager")
     while True:
@@ -37,7 +43,7 @@ def main():
             else:
                 password = generate_password(password_length)
                 print("Generated Password:", password)
-        
+
         elif choice == "2":
             username = input("Enter the username: ")
             password = input("Enter the password: ")
@@ -51,5 +57,6 @@ def main():
         else:
             print("Invalid choice. Please choose 1, 2, or 3.")
 
+# Entry point for the program
 if __name__ == "__main__":
     main()
