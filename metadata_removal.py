@@ -51,30 +51,27 @@ def remove_metadata(file_path):
     image.save(file_path, exif=b"")
 
 # Entry point for the program
-if __name__ == "__main":
+if __name__ == "__main__":
     while True:
-        file_path = input("Enter the path to an image: ")
-
+        file_path = input("\nEnter the path to an image: ")
         metadata_type = detect_metadata_type(file_path)
-
         if metadata_type == 'Unsupported':
-            print("Unsupported file type.")
+            print("\nUnsupported file type.")
         else:
-            print(f"Detected file type: {metadata_type}")
-            
+            print(f"\nDetected file type: {metadata_type}")
             if metadata_type == 'Image':
                 image = Image.open(file_path)
                 metadata = image
-            print("Available Metadata:")
+            print("\nAvailable Metadata:\n")
             metadata_result = print_metadata(metadata)
             
             if metadata_result is not None:
-                user_choice = input("Do you want to remove the metadata? (yes/no): ").strip().lower()
+                user_choice = input("\nDo you want to remove the metadata? (yes/no): ").strip().lower()
                 if user_choice == 'yes':
                     remove_metadata(file_path)
-                    print("Metadata removed.")
+                    print("\nMetadata removed.")
                 
-        another_image = input("Do you want to process another image? (yes/no): ").strip().lower()
+        another_image = input("\nDo you want to process another image? (yes/no): ").strip().lower()
         if another_image != 'yes':
-            print("Exit...")
+            print("\nExit...\n")
             break
