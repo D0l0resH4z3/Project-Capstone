@@ -54,6 +54,10 @@ def remove_metadata(file_path):
 if __name__ == "__main__":
     while True:
         file_path = input("\nEnter the path to an image: ")
+        if not os.path.exists(file_path):
+            print("\nError: File not found.")
+            continue 
+        
         metadata_type = detect_metadata_type(file_path)
         if metadata_type == 'Unsupported':
             print("\nUnsupported file type.")
