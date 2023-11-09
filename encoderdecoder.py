@@ -1,4 +1,21 @@
+#String encoder/decoder using Vigenère cipher encryption
+
 import string
+
+def caesar_cipher(text, shift, action):
+    result = []
+    for char in text:
+        if char.isalpha():
+            is_upper = char.isupper()
+            char = char.lower()
+            if action == "encode":
+                char = chr(((ord(char) - ord('a') + shift) % 26) + ord('a'))
+            elif action == "decode":
+                char = chr(((ord(char) - ord('a') - shift) % 26) + ord('a'))
+            if is_upper:
+                char = char.upper()
+        result.append(char)
+    return ''.join(result)
 
 def vigenere_cipher(text, key, action):
     result = []
@@ -22,16 +39,27 @@ def vigenere_cipher(text, key, action):
     return ''.join(result)
 
 def main():
+    method = input("Choose an encryption method (Caesar/Vigenere): ").strip().lower()
+    if method not in ['caesar', 'vigenere']:
+        print("Invalid method. Please choose 'Caesar' or 'Vigenere'.")
+        return
+
     action = input("Enter 'encode' to encode or 'decode' to decode: ").strip().lower()
     if action not in ['encode', 'decode']:
         print("Invalid action. Please enter 'encode' or 'decode'.")
         return
 
     text = input("Enter the text: ")
-    key = input("Enter the key: ")
 
-    encoded_text = vigenere_cipher(text, key, action)
-    print(f"Result: {encoded_text}")
+    if method == "caesar":
+        shift = int(input("Enter the shift value: "))
+        result = caesar_cipher(text, shift, action)
+    elif method == "vigenere":
+        key = input("Enter the key: ")
+        result = vigenere_cipher(text, key, action)
+
+    print(f"Result: {result}")
 
 if __name__ == "__main__":
     main()
+
