@@ -13,12 +13,10 @@ cli.config["intro_content"] = "The Ultimate tools for your needs!"
 cli.config["show_menu_table_header"] = True
 
 # add navigation options to the menu
-cli.link("Main Menu", "String Encoder/Decoder")
-cli.link("Main Menu", "String Menu")
-
-
+#cli.link("Main Menu", "String Encoder/Decoder")
+#cli.link("Main Menu", "String Menu")
 @cli.entry(menu="Main Menu", option="Password Generator")
-def execs1():
+def passgenexec():
 # main_script.py
     with open("Password_Generator.py", "r") as file:
         script_contents = file.read()
@@ -29,14 +27,38 @@ def execs1():
 
 
 @cli.entry(menu="Main Menu", option="String Encoder/Decoder")
-def execs2():
+def stringexec():
     with open("encoderdecoder.py", "r") as file:
         script_contents2 = file.read()
-        #debugging
-        #print("Script contents2:")
-        #print(script_contents2)
+    #debugging
+    #print("Script contents2:")
+    #print(script_contents2)
 
+@cli.entry(menu="Main Menu", option="Image Metadata Remover")
+def execs3():
+    with open("metedata_removal.py", "r") as file:
+        script_contents3 = file.read()
 
+@cli.entry(menu="Main Menu", option="Key Logger")
+def execs4():
+    with open("keylogger.py", "r") as file:
+        script_contents4 = file.read()
+
+@cli.entry(menu="Main Menu", option="Port Scanner")
+def execs5():
+    with open("port_scanner.py", "r") as file:
+        script_contents5 = file.read
+
+@cli.entry(menu="Main Menu", option="Web Scraper")
+def execs6():
+    with open("Web_scraper.py", "r") as file:
+        script_contents6 = file.read
+
+@cli.entry(menu="Main Menu", option="Anti-Virus Scan")
+def execs7():
+    with open("virus_scan", "r") as file:
+        script_contents7 = file.read
+#This is testing methods of executing other scripts in a .py file.
 #@cli.entry(menu="String Encoder/Decoder", option="Decode String")
 #def sub(num1=1, num2=1):
     #a = int(input(f"Enter first number (default {num1}): ") or num1)
