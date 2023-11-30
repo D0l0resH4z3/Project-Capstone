@@ -1,5 +1,4 @@
-# This program will scan for IP address and ports
-# Import necessary modules
+
 
 import socket
 import ipaddress
@@ -14,7 +13,7 @@ def scan_specific_ip(ip, start_port, end_port):
                 if result == 0:
                     open_ports.append(port)
     except socket.error:
-        print("Error scanning {ip}")
+        print("\nError scanning {ip}")
     return open_ports
 
 def scan_subnet(subnet, port):
@@ -28,14 +27,14 @@ def scan_subnet(subnet, port):
 
 if __name__ == "__main__":
     while True:
-        print("-"*50)
+        print("\nPort Scanner\n")
         print("\n1. Scan a specific IP address with a specific port")
         print("2. Scan a specific IP address with a specific port range")
-        print("3. Scan a specific IP address with well-known ports")
+        print("3. Scan a specific IP address with well-known ports (1-1024)")
         print("4. Scan a subnet for active IP addresses")
-        print("5. Exit")
+        print("0. Exit\n")
         
-        choice = input("\nEnter your choice (1/2/3/4/5): ")
+        choice = input("\nEnter your choice: ")
         
         if choice == "1":
             ip = input("\nEnter the IP address to scan: ")
@@ -60,10 +59,10 @@ if __name__ == "__main__":
                 
         elif choice == "3":
             ip = input("\nEnter the IP address to scan: ")
-            open_ports = scan_specific_ip(ip, 1, 1024)  # Well-known ports range
+            open_ports = scan_specific_ip(ip, 1, 1024)  
             
             if open_ports:
-                print(f"\nopen ports : {', '.join(map(str, open_ports))}")
+                print(f"\n open ports : {', '.join(map(str, open_ports))}")
             else:
                 print("\nNo open ports found ")
                 
@@ -81,4 +80,4 @@ if __name__ == "__main__":
         elif choice == "5":
             break
         else:
-            print("\nInvalid choice. Please select 1, 2, 3, 4, or 5.")
+            print("\nInvalid choice !!!")

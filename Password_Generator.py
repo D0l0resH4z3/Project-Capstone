@@ -25,38 +25,34 @@ def save_password(username, password):
         # Write the username and password 
         file.write(f"Username: {username}, Password: {password}\n")
 
-# Main function to manage password generation and storage
-def main():
-    print("Password Manager")
+
+if __name__ == "__main__":
+    print("\nPassword Manager")
     while True:
         print("\nOptions:")
         print("1. Generate a new password")
         print("2. Save a password")
-        print("3. Quit")
+        print("0. Exit\n")
         
-        choice = input("Enter your choice (1/2/3): ")
+        choice = input("\nEnter the number of your choice: ")
         
         if choice == "1":
-            password_length = int(input("Enter the length of the password: "))
+            password_length = int(input("\nEnter the length of the password: "))
             if password_length < 8:
-                print("Password length should be at least 8 characters for security.")
+                print("\nPassword length should be at least 8 characters for security.")
             else:
                 password = generate_password(password_length)
-                print("Generated Password:", password)
+                print("\nGenerated Password:", password)
 
         elif choice == "2":
-            username = input("Enter the username: ")
+            username = input("\nEnter the username: ")
             password = input("Enter the password: ")
             save_password(username, password)
             print("Password saved successfully!")
         
-        elif choice == "3":
-            print("Goodbye!")
+        elif choice == "0":
+            print("\nExiting the Password Generator.")
             break
         
         else:
-            print("Invalid choice. Please choose 1, 2, or 3.")
-
-# Entry point for the program
-if __name__ == "__main__":
-    main()
+            print("Invalid choice !!!")
