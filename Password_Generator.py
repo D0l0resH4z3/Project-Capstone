@@ -2,36 +2,51 @@
 # Import necessary modules
 import string
 import secrets
+import mysql.connector
+
+# Establish a connection to the MySQL database
+conn = mysql.connector.connect(
+    host='localhost',
+    user='your_username',
+    password='your_password',
+    database='your_database'
+)
+cursor = conn.cursor()
+
+# Create a table to store passwords
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS passwords (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255),
+        password VARCHAR(255)
+    )
+''')
+conn.commit()
 
 # Function to generate a strong password of the given length
 def generate_password(length):
-    # Define the set of characters to choose from
     characters = string.ascii_letters + string.digits + string.punctuation
-    
-    password_chars = []  # Initialize an empty list to store password characters
+    password_chars = [secrets.choice(characters) for _ in range(length)]
+    return ''.join(password_chars)
 
-    # Generate each character of the password one by one
-    for _ in range(length):
-        password_chars.append(secrets.choice(characters))
-
-    # Join the characters to form the password
-    password = ''.join(password_chars)
-
-    return password
+# Function to save a username and password in the database
+def save_password_to_database(username, password):
+    cursor.execute('INSERT INTO passwords (username, password) VALUES (%s, %s)', (username, password))
+    conn.commit()
 
 # Function to save a username and password in a text file
-def save_password(username, password):
+def save_password_to_file(username, password):
     with open("passwords.txt", "a") as file:
-        # Write the username and password 
         file.write(f"Username: {username}, Password: {password}\n")
-
 
 if __name__ == "__main__":
     print("\nPassword Manager")
+    
     while True:
         print("\nOptions:")
         print("1. Generate a new password")
-        print("2. Save a password")
+        print("2. Save a password to the database")
+        print("3. Save a password to a text file")
         print("0. Exit\n")
         
         choice = input("\nEnter the number of your choice: ")
@@ -47,11 +62,18 @@ if __name__ == "__main__":
         elif choice == "2":
             username = input("\nEnter the username: ")
             password = input("Enter the password: ")
-            save_password(username, password)
-            print("Password saved successfully!")
+            save_password_to_database(username, password)
+            print("Password saved to the database successfully!")
+
+        elif choice == "3":
+            username = input("\nEnter the username: ")
+            password = input("Enter the password: ")
+            save_password_to_file(username, password)
+            print("Password saved to the text file successfully!")
         
         elif choice == "0":
-            print("\nExiting the Password Generator.")
+            print("\nExiting the Password Manager.")
+            conn.close()
             break
         
         else:
