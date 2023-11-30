@@ -4,24 +4,32 @@ import string
 import secrets
 import mysql.connector
 
-# Establish a connection to the MySQL database
-conn = mysql.connector.connect(
-    host='localhost',
-    user='your_username',
-    password='your_password',
-    database='your_database'
-)
-cursor = conn.cursor()
+# Function to establish a connection to the MySQL database
+def connect_to_database():
+    try:
+        conn = mysql.connector.connect(
+            host='localhost',
+            user='your_username',
+            password='your_password',
+            database='your_database'
+        )
+        cursor = conn.cursor()
 
-# Create a table to store passwords
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS passwords (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(255),
-        password VARCHAR(255)
-    )
-''')
-conn.commit()
+        # Create a table to store passwords
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS passwords (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(255),
+                password VARCHAR(255)
+            )
+        ''')
+        conn.commit()
+
+        return conn, cursor
+
+    except mysql.connector.Error as e:
+        print(f"Error connecting to MySQL: {e}")
+        return None, None
 
 # Function to generate a strong password of the given length
 def generate_password(length):
@@ -30,17 +38,28 @@ def generate_password(length):
     return ''.join(password_chars)
 
 # Function to save a username and password in the database
-def save_password_to_database(username, password):
-    cursor.execute('INSERT INTO passwords (username, password) VALUES (%s, %s)', (username, password))
-    conn.commit()
+def save_password_to_database(conn, cursor, username, password):
+    try:
+        cursor.execute('INSERT INTO passwords (username, password) VALUES (%s, %s)', (username, password))
+        conn.commit()
+        print("Password saved to the database successfully!")
+    except mysql.connector.Error as e:
+        print(f"Error saving password to the database: {e}")
 
 # Function to save a username and password in a text file
 def save_password_to_file(username, password):
-    with open("passwords.txt", "a") as file:
-        file.write(f"Username: {username}, Password: {password}\n")
+    try:
+        with open("passwords.txt", "a") as file:
+            file.write(f"Username: {username}, Password: {password}\n")
+        print("Password saved to the text file successfully!")
+    except IOError as e:
+        print(f"Error saving password to the text file: {e}")
 
 if __name__ == "__main__":
     print("\nPassword Manager")
+
+    # Establish a connection to the database
+    conn, cursor = connect_to_database()
     
     while True:
         print("\nOptions:")
@@ -62,18 +81,17 @@ if __name__ == "__main__":
         elif choice == "2":
             username = input("\nEnter the username: ")
             password = input("Enter the password: ")
-            save_password_to_database(username, password)
-            print("Password saved to the database successfully!")
+            save_password_to_database(conn, cursor, username, password)
 
         elif choice == "3":
             username = input("\nEnter the username: ")
             password = input("Enter the password: ")
             save_password_to_file(username, password)
-            print("Password saved to the text file successfully!")
         
         elif choice == "0":
             print("\nExiting the Password Manager.")
-            conn.close()
+            if conn:
+                conn.close()
             break
         
         else:
