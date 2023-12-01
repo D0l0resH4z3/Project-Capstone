@@ -1,7 +1,34 @@
-import Password_Generator
 import string
-#import hypercli
 from hypercli import hypercli
+import getpass
+from Password_Generator import connect_to_database, generate_password, save_password_to_database, save_password_to_file
+
+# Hardcoded usernames and passwords
+user_credentials = {
+    "user1": "password1",
+    "user2": "password2",
+    # Add more usernames and passwords as needed
+}
+
+def login():
+    print("Login to access the main menu.")
+    username = input("Username: ")
+    password = getpass.getpass("Password: ")
+
+    # Check if the entered username and password are valid
+    if username in user_credentials and user_credentials[username] == password:
+        print("Login successful!\n")
+        return True
+    else:
+        print("Invalid username or password. Please try again.\n")
+        return False
+
+# Add the login prompt before the main menu
+while not login():
+    pass  # Continue prompting for login until successful
+
+# Establish a connection to the database
+conn, cursor = connect_to_database()
 
 # create an instance of hypercli
 cli = hypercli()
@@ -9,21 +36,27 @@ cli = hypercli()
 # configure the instance
 cli.config["banner_text"] = "CyberSuite Tools"
 cli.config["intro_title"] = "Intro"
-cli.config["intro_content"] = "The Ultimate tools for your needs!"
+cli.config["intro_content"] = "The Ultimate Cyber tools for your needs!"
 cli.config["show_menu_table_header"] = True
 
 # add navigation options to the menu
-#cli.link("Main Menu", "String Encoder/Decoder")
-#cli.link("Main Menu", "String Menu")
 @cli.entry(menu="Main Menu", option="Password Generator")
 def passgenexec():
-# main_script.py
-    with open("Password_Generator.py", "r") as file:
-        script_contents = file.read()
-    #debugging - remove
-    print("Script contents:")
-    print(script_contents)
-    exec(script_contents, globals(), locals())
+    # Get password length from user input
+    password_length = int(input("\nEnter the length of the password: "))
+    if password_length < 8:
+        print("\nPassword length should be at least 8 characters for security.")
+    else:
+        # Generate a password
+        password = generate_password(password_length)
+        print("\nGenerated Password:", password)
+
+        # Save the password to the database
+        save_password_to_database(conn, cursor, "hardcoded_user", password)
+
+        # Save the password to a text file
+        save_password_to_file("hardcoded_user", password)
+
 
 
 @cli.entry(menu="Main Menu", option="String Encoder/Decoder")
