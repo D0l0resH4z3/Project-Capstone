@@ -7,10 +7,10 @@ from datetime import datetime
 def connect_to_database():
     try:
         conn = mysql.connector.connect(
-            host='aws.connect.psdb.cloud',
-            user='j2qfze5bw9iig9pkg1ap',
-            password='pscale_pw_bcxKV2tNaYAExXgEkLLUhk3vf49zjCuv4rJ5FxZ0yTW',
-            database='projectcapstonecybersuite'
+            host='your_database_host',
+            user='your_database_user',
+            password='your_database_password',
+            database='your_database_name'
         )
         cursor = conn.cursor()
 
