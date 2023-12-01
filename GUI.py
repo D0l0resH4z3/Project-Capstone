@@ -1,11 +1,13 @@
 import string
 import os
 import hashlib
-import time  # Add this line to import the time module
+import time
 from hypercli import hypercli
 import getpass
 import subprocess
+import mysql.connector
 from Password_Generator import connect_to_database, generate_password, save_password_to_database, save_password_to_file
+from File_Integrity_Anti_Virus import connect_to_database, check_file_changes
 
 # Hardcoded usernames and passwords
 user_credentials = {
@@ -91,42 +93,24 @@ def execs6():
 
 @cli.entry(menu="Main Menu", option="Anti-Virus Scan | File Integrity Check")
 def execs7():
-    # Get the script contents from File_Integrity_Anti-Virus.py
-    with open("File_Integrity_Anti-Virus.py", "r") as file:
-        script_contents7 = file.read()
+    # Function to execute File_Integrity_Anti-Virus.py
+    def execute_file_integrity_check():
+        directory_path = "D:\CapstoneGithub\Project-Capstone"
 
-    # Define required functions
-    def calculate_file_hash(file_path):
-        sha256_hash = hashlib.sha256()
-        with open(file_path, "rb") as file:
-            for byte_block in iter(lambda: file.read(4096), b""):
-                sha256_hash.update(byte_block)
-        return sha256_hash.hexdigest()
+        # Establish a connection to the database
+        conn, cursor = connect_to_database()
 
-    def check_file_changes(directory):
-        for filename in os.listdir(directory):
-            if filename.endswith(".py"):
-                file_path = os.path.join(directory, filename)
-                current_hash = calculate_file_hash(file_path)
-                
-                if file_path in file_hashes:
-                    if file_hashes[file_path] != current_hash:
-                        print(f"Alert: {filename} has been modified!")
-                else:
-                    file_hashes[file_path] = current_hash
+        try:
+            # Pass conn and cursor to the function
+            check_file_changes(directory_path, conn, cursor, file_hashes)
 
-    # Pass required modules and functions to exec
-    exec_globals = {
-        "__file__": "File_Integrity_Anti-Virus.py",
-        "__name__": "__main__",
-        "os": os,
-        "hashlib": hashlib,
-        "calculate_file_hash": calculate_file_hash,
-        "check_file_changes": check_file_changes,
-        "file_hashes": file_hashes,  # Pass the dictionary to the exec environment
-    }
+        except KeyboardInterrupt:
+            print("Exiting the program.")
+            if conn:
+                conn.close()
 
-    exec(script_contents7, exec_globals, locals())
+    # Call the function to execute File_Integrity_Anti-Virus.py
+    execute_file_integrity_check()
     time.sleep(1)  # Add a delay for better visibility of potential alerts
 
 # run the cli
