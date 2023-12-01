@@ -34,6 +34,7 @@ if __name__ == "__main__":
     file_hashes = {}      # Dictionary to store file hashes
 
     while True:
+    
         check_file_changes(directory_path)
 
         # Optional: Adjust the sleep time based on your needs
