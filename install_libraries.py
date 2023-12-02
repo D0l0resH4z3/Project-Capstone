@@ -1,44 +1,35 @@
-import subprocess
 
+import subprocess
 
 def update_pip():
     try:
-        subprocess.run(['python', '-m', 'pip', 'install', '--upgrade', 'pip'], check=True)
-        print("\nSuccessfully updated: pip\n")
+        result = subprocess.run(['python', '-m', 'pip', 'install', '--upgrade', 'pip'], capture_output=True, text=True, check=True)
+        print("\nSuccessfully updated: pip")
     except subprocess.CalledProcessError as e:
-        print(f"\nFailed to update pip.\n Error: {e}\n")
+        print(f"\nFailed to update pip. Error: {e}")
+        print(result.stdout)  
+        return result.returncode
 
-def install_libraries(libraries):
+def install_library(library):
+    try:
+        result = subprocess.run(['pip', 'install', library], capture_output=True, text=True, check=True)
+        print(f"Successfully installed: {library}")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to install {library}. Error: {e}")
+        print(result.stdout)  
+        return result.returncode
+
+def install_libraries():
+    libraries = ['cryptography','fernet', 'hypercli', 'requests', 
+                 'beautifulsoup4', 'pynput', 'Pillow',
+                 'pybase64','mysql.connector','pyfiglet ']  
+
     for library in libraries:
-        try:
-            subprocess.run(['pip', 'install', library], check=True)
-            print(f"\nSuccessfully installed: {library}\n")
-        except subprocess.CalledProcessError as e:
-            print(f"\nFailed to install {library}.\n Error: {e}\n")
+        install_library(library)
 
-def add_user_library(libraries):
-    user_input = input("\nDo you want to add any other library (Y/N): \n")
-    if user_input.lower() == "y":
-        
-        user_library = input("\nEnter the name of the library you want to add: \n")
-        if user_library:
-            
-            try:
-                subprocess.run(['pip', 'install', user_library], check=True)
-                print(f"\nSuccessfully installed: {user_library}\n")
-            except subprocess.CalledProcessError as e:
-                print(f"\nFailed to install {user_library}.\n Error: {e}\n")
-        print("\nDone.\n")        
-        
-    elif user_input.lower() == "n":
-        print("\nDone.\n")
-        
-        
 if __name__ == "__main__":
-    libraries_to_install = ['ipaddress', 'cryptography', 'hypercli', 'requests', 'beautifulsoup4', 'bs4', 'pynput', 'os-sys', 'Pillow']
     
+   
     update_pip()
     
-    install_libraries(libraries_to_install)
-    
-    add_user_library(libraries_to_install)
+    install_libraries()
