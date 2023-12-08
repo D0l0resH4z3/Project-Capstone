@@ -1,6 +1,5 @@
-#String encoder/decoder using Vigenère cipher encryption
-
 import string
+import time
 
 def caesar_cipher(text, shift, action):
     result = []
@@ -38,28 +37,32 @@ def vigenere_cipher(text, key, action):
         result.append(char)
     return ''.join(result)
 
-def main():
+def main(method, action, text, shift=None, key=None):
+    if method == "caesar":
+        if shift is None:
+            print("Shift value is required for the Caesar cipher.")
+            return None
+        result = caesar_cipher(text, shift, action)
+    elif method == "vigenere":
+        if key is None:
+            print("Key is required for the Vigenere cipher.")
+            return None
+        result = vigenere_cipher(text, key, action)
+    else:
+        print(f"Invalid method: {method}. Please choose 'caesar' or 'vigenere'.")
+        return None
+
+    print(f"Result: {result}")
+    time.sleep(5)  # Add a sleep of 5 seconds
+
+if __name__ == "__main__":
     method = input("Choose an encryption method (Caesar/Vigenere): ").strip().lower()
-    if method not in ['caesar', 'vigenere']:
-        print("Invalid method. Please choose 'Caesar' or 'Vigenere'.")
-        return
-
     action = input("Enter 'encode' to encode or 'decode' to decode: ").strip().lower()
-    if action not in ['encode', 'decode']:
-        print("Invalid action. Please enter 'encode' or 'decode'.")
-        return
-
     text = input("Enter the text: ")
 
     if method == "caesar":
         shift = int(input("Enter the shift value: "))
-        result = caesar_cipher(text, shift, action)
+        main(method, action, text, shift=shift)
     elif method == "vigenere":
         key = input("Enter the key: ")
-        result = vigenere_cipher(text, key, action)
-
-    print(f"Result: {result}")
-
-if __name__ == "__main__":
-    main()
-
+        main(method, action, text, key=key)

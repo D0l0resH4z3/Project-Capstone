@@ -1,17 +1,19 @@
-# This program will generate strong passwords with the length of the user`s choice and save passwords with username in a text file
 # Import necessary modules
 import string
 import secrets
 import mysql.connector
+import subprocess
+import sys
+import time  # Import the time module
 
 # Function to establish a connection to the MySQL database
 def connect_to_database():
     try:
         conn = mysql.connector.connect(
-            host='localhost',
-            user='your_username',
-            password='your_password',
-            database='your_database'
+            host='aws.connect.psdb.cloud',
+            user='79u9r9663s85vutevk0d',
+            password='pscale_pw_ksUEzXbwUQOhTLEXhTN3X2hXM5ZSqEUmHzV0K9DFLYZ',
+            database='projectcapstonecybersuite'
         )
         cursor = conn.cursor()
 
@@ -43,6 +45,10 @@ def save_password_to_database(conn, cursor, username, password):
         cursor.execute('INSERT INTO passwords (username, password) VALUES (%s, %s)', (username, password))
         conn.commit()
         print("Password saved to the database successfully!")
+
+        # Wait for 5 seconds after a successful save
+        time.sleep(5)
+
     except mysql.connector.Error as e:
         print(f"Error saving password to the database: {e}")
 
@@ -52,6 +58,10 @@ def save_password_to_file(username, password):
         with open("passwords.txt", "a") as file:
             file.write(f"Username: {username}, Password: {password}\n")
         print("Password saved to the text file successfully!")
+
+        # Wait for 5 seconds after a successful save
+        time.sleep(5)
+
     except IOError as e:
         print(f"Error saving password to the text file: {e}")
 
@@ -60,16 +70,16 @@ if __name__ == "__main__":
 
     # Establish a connection to the database
     conn, cursor = connect_to_database()
-    
+
     while True:
         print("\nOptions:")
         print("1. Generate a new password")
         print("2. Save a password to the database")
         print("3. Save a password to a text file")
-        print("0. Exit\n")
-        
+        print("0. Exit and go back to GUI.py\n")
+
         choice = input("\nEnter the number of your choice: ")
-        
+
         if choice == "1":
             password_length = int(input("\nEnter the length of the password: "))
             if password_length < 8:
@@ -87,12 +97,17 @@ if __name__ == "__main__":
             username = input("\nEnter the username: ")
             password = input("Enter the password: ")
             save_password_to_file(username, password)
-        
+
         elif choice == "0":
             print("\nExiting the Password Manager.")
             if conn:
                 conn.close()
+            # Launch GUI.py using subprocess and sys.executable
+            subprocess.run([sys.executable, "GUI.py"])
+
+            # No sleep here, as we have already added sleep in the save_password functions
+
             break
-        
+
         else:
             print("Invalid choice !!!")
