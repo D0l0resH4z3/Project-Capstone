@@ -7,9 +7,9 @@ def caesar_cipher(text, shift, action):
         if char.isalpha():
             is_upper = char.isupper()
             char = char.lower()
-            if action == "encode":
+            if action == "e":
                 char = chr(((ord(char) - ord('a') + shift) % 26) + ord('a'))
-            elif action == "decode":
+            elif action == "d":
                 char = chr(((ord(char) - ord('a') - shift) % 26) + ord('a'))
             if is_upper:
                 char = char.upper()
@@ -25,9 +25,9 @@ def vigenere_cipher(text, key, action):
             char = char.lower()
             key_char = key[i % key_length].lower()
 
-            if action == "encode":
+            if action == "e":
                 shift = (ord(char) + ord(key_char) - 2 * ord('a')) % 26
-            elif action == "decode":
+            elif action == "d":
                 shift = (ord(char) - ord(key_char) + 26) % 26
 
             char = chr(shift + ord('a'))
@@ -38,31 +38,31 @@ def vigenere_cipher(text, key, action):
     return ''.join(result)
 
 def main(method, action, text, shift=None, key=None):
-    if method == "caesar":
+    if method == "c":
         if shift is None:
-            print("Shift value is required for the Caesar cipher.")
+            print("\nShift value is required for the Caesar cipher.")
             return None
         result = caesar_cipher(text, shift, action)
-    elif method == "vigenere":
+    elif method == "v":
         if key is None:
-            print("Key is required for the Vigenere cipher.")
+            print("\nKey is required for the Vigenere cipher.")
             return None
         result = vigenere_cipher(text, key, action)
     else:
-        print(f"Invalid method: {method}. Please choose 'caesar' or 'vigenere'.")
+        print(f"\nInvalid method: {method}. Please choose 'caesar' or 'vigenere'.")
         return None
 
-    print(f"Result: {result}")
-    time.sleep(5)  # Add a sleep of 5 seconds
+    print(f"\nResult: {result}")
+    time.sleep(3)  # Add a sleep of 3 seconds
 
 if __name__ == "__main__":
-    method = input("Choose an encryption method (Caesar/Vigenere): ").strip().lower()
-    action = input("Enter 'encode' to encode or 'decode' to decode: ").strip().lower()
-    text = input("Enter the text: ")
+    method = input("\nChoose an encryption method Caesar or Vigenere  (C/V): ").strip().lower()
+    action = input("\nEnter 'E' to encode or 'D' to decode (E/D): ").strip().lower()
+    text = input("\nEnter the text: ")
 
-    if method == "caesar":
-        shift = int(input("Enter the shift value: "))
+    if method == "c":
+        shift = int(input("\nEnter the shift value: "))
         main(method, action, text, shift=shift)
-    elif method == "vigenere":
-        key = input("Enter the key: ")
+    elif method == "v":
+        key = input("\nEnter the key: ")
         main(method, action, text, key=key)
