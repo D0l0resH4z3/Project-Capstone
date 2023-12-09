@@ -1,37 +1,18 @@
-# Import necessary modules
+
 import string
 import secrets
-import mysql.connector
-import subprocess
-import sys
+import firebase_admin
+from firebase_admin import credentials, firestore
 import time  # Import the time module
 
-# Function to establish a connection to the MySQL database
-def connect_to_database():
+def initialize_firebase(credentials_path):
     try:
-        conn = mysql.connector.connect(
-            host='host',
-            user='user',
-            password='password',
-            database='database'
-        )
-        cursor = conn.cursor()
-
-        # Create a table to store passwords
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS passwords (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(255),
-                password VARCHAR(255)
-            )
-        ''')
-        conn.commit()
-
-        return conn, cursor
-
-    except mysql.connector.Error as e:
-        print(f"Error connecting to MySQL: {e}")
-        return None, None
+        # Initialize Firebase with your credentials
+        cred = credentials.Certificate(credentials_path)
+        firebase_admin.initialize_app(cred)
+        print("\nDatabase initialized successfully.")
+    except Exception as e:
+        print(f"\nError initializing Database: {e}")
 
 # Function to generate a strong password of the given length
 def generate_password(length):
@@ -40,58 +21,69 @@ def generate_password(length):
     return ''.join(password_chars)
 
 # Function to save a username and password in the database
-def save_password_to_database(conn, cursor, username, password):
+def save_password_to_database(username, password):
+    credentials_path = input("\nEnter the path to the Database credentials file: ")
+    initialize_firebase(credentials_path)
     try:
-        cursor.execute('INSERT INTO passwords (username, password) VALUES (%s, %s)', (username, password))
-        conn.commit()
-        print("Password saved to the database successfully!")
+        db = firestore.client()
 
-        # Wait for 5 seconds after a successful save
-        time.sleep(5)
+        # Create a dictionary with credentials and file content
+        data_to_save = {'username': username, 'password': password}
 
-    except mysql.connector.Error as e:
-        print(f"Error saving password to the database: {e}")
+        # Add the data to Firestore
+        db.collection('credentials').add(data_to_save)
+        print("\nPassword saved to the database successfully!")
+        hold=input()
+
+    except Exception as e:
+        print(f"\nError saving password to the database: {e}")
 
 # Function to save a username and password in a text file
 def save_password_to_file(username, password):
     try:
         with open("passwords.txt", "a") as file:
             file.write(f"Username: {username}, Password: {password}\n")
-        print("Password saved to the text file successfully!")
-
-        # Wait for 5 seconds after a successful save
-        time.sleep(5)
+        print("\nPassword saved to the text file successfully!")
+        hold=input()
 
     except IOError as e:
-        print(f"Error saving password to the text file: {e}")
+        print(f"\nError saving password to the text file: {e}")
+        hold=input()
+
+# Function to get a valid integer input from the user
+def get_valid_integer_input(prompt):
+    while True:
+        try:
+            value = int(input(prompt))
+            return value
+        except ValueError:
+            print("\nInvalid input. Please enter a valid integer.")
 
 if __name__ == "__main__":
     print("\nPassword Manager")
-
-    # Establish a connection to the database
-    conn, cursor = connect_to_database()
 
     while True:
         print("\nOptions:")
         print("1. Generate a new password")
         print("2. Save a password to the database")
         print("3. Save a password to a text file")
-        print("0. Exit and go back to GUI.py\n")
+        print("0. Exit \n")
 
         choice = input("\nEnter the number of your choice: ")
 
         if choice == "1":
-            password_length = int(input("\nEnter the length of the password: "))
+            password_length = get_valid_integer_input("\nEnter the length of the password: ")
             if password_length < 8:
                 print("\nPassword length should be at least 8 characters for security.")
             else:
                 password = generate_password(password_length)
                 print("\nGenerated Password:", password)
+                hold=input()
 
         elif choice == "2":
             username = input("\nEnter the username: ")
             password = input("Enter the password: ")
-            save_password_to_database(conn, cursor, username, password)
+            save_password_to_database(username, password)
 
         elif choice == "3":
             username = input("\nEnter the username: ")
@@ -100,14 +92,9 @@ if __name__ == "__main__":
 
         elif choice == "0":
             print("\nExiting the Password Manager.")
-            if conn:
-                conn.close()
-            # Launch GUI.py using subprocess and sys.executable
-            subprocess.run([sys.executable, "GUI.py"])
-
-            # No sleep here, as we have already added sleep in the save_password functions
-
             break
 
         else:
-            print("Invalid choice !!!")
+            print("\nInvalid choice !!!")
+            hold=input()
+            
