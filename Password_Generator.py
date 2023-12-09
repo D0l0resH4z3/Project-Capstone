@@ -3,12 +3,24 @@ import string
 import secrets
 import firebase_admin
 from firebase_admin import credentials, firestore
-import time  # Import the time module
 
-def initialize_firebase(credentials_path):
+# Function to initialize Firebase with hardcoded credentials
+def initialize_firebase():
     try:
-        # Initialize Firebase with your credentials
-        cred = credentials.Certificate(credentials_path)
+        # Replace the following credentials with your hardcoded values
+        cred = credentials.Certificate({
+            "type": "",
+            "project_id": "",
+            "private_key_id": "",
+            "private_key": "",
+            "client_email": "",
+            "client_id": "",
+            "auth_uri": "",
+            "token_uri": "",
+            "auth_provider_x509_cert_url": "",
+            "client_x509_cert_url": "",
+            "universe_domain": ""
+        })
         firebase_admin.initialize_app(cred)
         print("\nDatabase initialized successfully.")
     except Exception as e:
@@ -22,8 +34,7 @@ def generate_password(length):
 
 # Function to save a username and password in the database
 def save_password_to_database(username, password):
-    credentials_path = input("\nEnter the path to the Database credentials file: ")
-    initialize_firebase(credentials_path)
+    initialize_firebase()  # Initialize Firebase with hardcoded credentials
     try:
         db = firestore.client()
 
