@@ -1,4 +1,3 @@
-
 from hypercli import hypercli
 import getpass
 import subprocess
@@ -29,33 +28,6 @@ def login():
 while not login():
     pass  # Continue prompting for login until successful
 
-def connect_to_database():
-    try:
-        conn = mysql.connector.connect(
-            host='localhost',
-            user='your_username',
-            password='your_password',
-            database='your_database'
-        )
-        cursor = conn.cursor()
-
-        # Create a table to store passwords
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS passwords (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(255),
-                password VARCHAR(255)
-            )
-        ''')
-        conn.commit()
-
-        return conn, cursor
-
-    except mysql.connector.Error as e:
-        print(f"Error connecting to MySQL: {e}")
-        return None, None
-# Establish a connection to the database
-conn, cursor = connect_to_database()
 
 # create an instance of hypercli
 cli = hypercli()

