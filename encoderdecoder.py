@@ -1,5 +1,6 @@
-import string
+
 import time
+
 
 def caesar_cipher(text, shift, action):
     result = []
@@ -53,16 +54,46 @@ def main(method, action, text, shift=None, key=None):
         return None
 
     print(f"\nResult: {result}")
-    time.sleep(3)  # Add a sleep of 3 seconds
+    hold=input("\n\nPress enter to continue. ") 
 
 if __name__ == "__main__":
-    method = input("\nChoose an encryption method Caesar or Vigenere  (C/V): ").strip().lower()
-    action = input("\nEnter 'E' to encode or 'D' to decode (E/D): ").strip().lower()
-    text = input("\nEnter the text: ")
+    while True:
+        
+        while True:
+            method = input("\nChoose an encryption method Caesar or Vigenere  (C/V): ").strip().lower()
+            if method == "c" or method == "v":
+                break
+            else:
+                print("\nInvalid choice. Please enter a valid option.")
+                
+        while True:
+            action = input("\nEnter 'E' to encode or 'D' to decode (E/D): ").strip().lower()
+            if action == "e" or action == "d":
+                break
+            else:
+                print("\nInvalid choice. Please enter a valid option.")
+                
+        text = input("\nEnter the text: ")
 
-    if method == "c":
-        shift = int(input("\nEnter the shift value: "))
-        main(method, action, text, shift=shift)
-    elif method == "v":
-        key = input("\nEnter the key: ")
-        main(method, action, text, key=key)
+        if method == "c":
+            shift = int(input("\nEnter the shift value: "))
+            main(method, action, text, shift=shift)
+            choice_1 = input("\nDo you want to continue (Y/N):  ").lower()
+            if choice_1 == "n":
+                print("\nExiting the Encoder/Decoder...")
+                time.sleep(3)
+                break
+            elif choice_1 != "y":
+                print("\nInvalid choice. Please enter a valid option.")
+                
+        elif method == "v":
+            key = input("\nEnter the key: ")
+            main(method, action, text, key=key)
+            choice_2 = input("\nDo you want to continue (Y/N):  ").lower()
+            if choice_2 == "n":
+                print("\nExiting the Encoder/Decoder...")
+                time.sleep(3)
+                break
+            elif choice_2 != "y":
+                print("\nInvalid choice. Please enter a valid option.")
+
