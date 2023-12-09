@@ -142,9 +142,9 @@ if __name__ == "__main__":
                 
         while True:    
             another_file = input( "\nDo you want to encrypt or decrypt another file? (Y/N): ").lower()
-            if another_file == 'yes':
+            if another_file == 'y':
                 break
-            elif another_file == 'no':    
+            elif another_file == 'n':    
                     print("\nExit...\n")
                     exit()
             else:
