@@ -2,6 +2,7 @@ import os
 import hashlib
 from firebase_admin import credentials, firestore, initialize_app
 from datetime import datetime
+import keyboard
 
 # Function to initialize Firebase with hardcoded credentials
 def initialize_firebase():
@@ -25,6 +26,7 @@ def initialize_firebase():
     except Exception as e:
         print(f"\nError initializing Firebase: {e}")
 
+# Function to establish a connection to the Firebase database
 # Function to establish a connection to the Firebase database
 def connect_to_database():
     initialize_firebase()
@@ -59,11 +61,30 @@ def check_file_changes(directory, db, file_hashes):
                 file_path = os.path.join(directory, filename)
                 current_hash = calculate_file_hash(file_path)
 
-                if file_path in file_hashes:
-                    if file_hashes[file_path] != current_hash:
-                        # File has been modified, send alert to the database
-                        insert_alert_to_database(db, filename)
-                else:
+                if file_path not in file_hashes:
+                    file_hashes[file_path] = current_hash
+                    continue
+
+                with open(file_path, 'r') as file:
+                    lines = file.readlines()
+                    modified_lines = []
+
+                    for line in lines:
+                        if "credentials.Certificate" in line:
+                            # Skip the line containing the specific credentials string
+                            pass
+                        else:
+                            modified_lines.append(line)
+
+                    # Update the file if any lines were modified
+                    # Comment out the following lines to skip file modification
+                    # if modified_lines:
+                    #     with open(file_path, 'w') as file:
+                    #         file.writelines(modified_lines)
+
+                if file_hashes[file_path] != current_hash:
+                    # File has been modified, send alert to the database
+                    insert_alert_to_database(db, filename)
                     file_hashes[file_path] = current_hash
 
         try:
