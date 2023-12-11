@@ -83,7 +83,10 @@ while True:
 
     @cli.entry(menu="Tools Menu", option="Key Logger")
     def keylogger():
-        subprocess.run(['python', 'keylogger.py'])
+        try:
+            subprocess.run(['python', 'keylogger.py'])
+        except KeyboardInterrupt:
+            print("keylogger interrupted. Exiting gracefully.")
 
     @cli.entry(menu="Tools Menu", option="Port Scanner")
     def Port_scanner():
