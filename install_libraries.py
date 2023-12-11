@@ -21,8 +21,8 @@ def install_library(library):
 
 def install_libraries():
     libraries = ['cryptography','fernet', 'hypercli', 'requests', 
-                 'beautifulsoup4', 'pynput', 'Pillow',
-                 'pybase64','mysql.connector','pyfiglet ']  
+                 'beautifulsoup4', 'pynput', 'Pillow','firebase_admin',
+                 'pybase64','pyfiglet ']  
 
     for library in libraries:
         install_library(library)
