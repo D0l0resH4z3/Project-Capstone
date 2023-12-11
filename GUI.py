@@ -99,7 +99,12 @@ while True:
 
     @cli.entry(menu="Tools Menu", option="Anti-Virus Scan | File Integrity Check")
     def File_Integrity_Anti_Virus():
-        subprocess.run(['python', 'File_Integrity_Anti_Virus.py'])
+
+        #subprocess.run(['python', 'File_Integrity_Anti_Virus.py'])
+        try:
+            subprocess.run(['python', 'File_Integrity_Anti_Virus.py'])
+        except KeyboardInterrupt:
+            print("File integrity check interrupted. Exiting gracefully.")
 
     @cli.entry(menu="Tools Menu", option="Quit ✗")
     def quit_program_2():
