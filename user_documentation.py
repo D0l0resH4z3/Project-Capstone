@@ -213,6 +213,16 @@ def tool_7():
             "The tool displays the result of the encryption or decryption process.\n")
       hold=input()
 
+def tool_8():
+      print("\n\nFile Integrity Check\n\n"
+            "Overview:\n"
+            "The File Integrity Check will read all the files in the official Github Repo excluding all database strings and check them against your files.\n"
+            "If it detects a file has been modified, it will print to the GUI that a specific file was modified, at what date and time, and send the alert to the database. \n\n"
+
+            "How to refresh tool:\n"
+            "By simply pressing enter, the entire tool will refresh itself and check the current state of the files.")
+      hold=input()
+
 def display_tools():
     while True:
         print("\nTools Available:\n")
@@ -223,6 +233,7 @@ def display_tools():
         print("5. Tool - Encryption/Decryption")
         print("6. Tool - Key Logger")
         print("7. Tool - String encoder/decoder")
+        print("8. Tool - File Integrity Check")
         print("0. Exit")
     
         
@@ -240,7 +251,9 @@ def display_tools():
         elif choice_2 == "6":
             tool_6() 
         elif choice_2 == "7":
-            tool_7()       
+            tool_7()    
+        elif choice_2 == "8":
+             tool_8()   
         elif choice_2 == "0":
             break         
         else:
