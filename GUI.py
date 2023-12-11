@@ -3,6 +3,7 @@ from hypercli import hypercli
 import getpass
 import subprocess
 import mysql.connector
+import time
 
 # Hardcoded usernames and passwords
 user_credentials = {
@@ -59,6 +60,12 @@ while True:
     @cli.entry(menu="Main Menu", option="Files")
     def Show_files():
         subprocess.run(['python', 'Show_files.py'])
+    
+    @cli.entry(menu="Main Menu", option="Quit")
+    def quit():
+        cli.exit()
+        time.sleep(2)
+        exit()
 
     # Add other entries for the Main Menu as needed
 
@@ -97,6 +104,7 @@ while True:
     @cli.entry(menu="Tools Menu", option="Quit ✗")
     def quit_program_2():
         cli.exit()
+        time.sleep(2)
         exit()
 
     # Run the cli
